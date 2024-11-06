@@ -8,14 +8,14 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Check Previous Notifications
+      - name: 알림 전송 이력이 있는지 확인
         id: check_notification
         uses: actions/cache@v3
         with:
           path: .notifications
           key: notifications-${{ github.event.pull_request.number }}
 
-      - name: Get Reviewers List
+      - name: 리뷰어 목록 가져오기
         if: steps.check_notification.outputs.cache-hit != 'true'
         id: reviewers
         uses: actions/github-script@v6
@@ -31,7 +31,7 @@ jobs:
             return mention.join(', ');
           result-encoding: string
 
-      - name: Send Slack notification
+      - name: 슬랙 알림 전송
         if: steps.check_notification.outputs.cache-hit != 'true'
         uses: slackapi/slack-github-action@v1.24.0
         with:
@@ -52,7 +52,7 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-      - name: Mark notification as sent
+      - name: 알림 전송 이력 생성
         if: steps.check_notification.outputs.cache-hit != 'true'
         run: |
           mkdir -p .notifications
